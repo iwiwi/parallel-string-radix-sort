@@ -1,4 +1,4 @@
-// Copyright 2010, Takuya Akiba
+// Copyright 2011, Takuya Akiba
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
