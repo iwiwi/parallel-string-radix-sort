@@ -31,12 +31,12 @@
 //   % g++ -O3 parallel_string_radix_sort_test.cc -lgtest -lgtest_main -fopenmp
 //   % ./a.out
 
-#include "parallel_string_radix_sort.h"
 #include <algorithm>
 #include <cstdlib>
 #include <iostream>
 #include <string>
 #include <gtest/gtest.h>
+#include "parallel_string_radix_sort.h"
 
 using testing::Types;
 
@@ -91,7 +91,7 @@ template<typename StringType> class Compare;
 
 template<> class Compare<const char*> {
  public:
-  inline bool operator()(const char * const &a, const char * const &b) {
+  inline bool operator()(const char* const &a, const char* const &b) {
     return strcmp(a, b) < 0;
   }
 };

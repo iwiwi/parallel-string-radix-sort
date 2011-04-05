@@ -1,13 +1,13 @@
-#include "parallel_string_radix_sort.h"
-
+#include <sys/time.h>
+#include <unistd.h>
+#include <stdarg.h>
 #include <cstdio>
 #include <cstring>
 #include <string>
 #include <algorithm>
 #include <cassert>
-#include <sys/time.h>
-#include <unistd.h>
-#include <stdarg.h>
+
+#include "parallel_string_radix_sort.h"
 
 const int MAX_LEN = 30;
 const int TRIAL = 3;
@@ -38,7 +38,7 @@ struct __bench__ {
   operator bool() { return false; }
 };
 
-#define benchmark(...) if(__bench__ __b__ = __bench__(__VA_ARGS__));else
+#define benchmark(...) if(__bench__ __b__ = __bench__(__VA_ARGS__)); else
 
 void InitRandom(const char **a, size_t n) {
   for (size_t i = 0; i < n; ++i) {
@@ -62,7 +62,7 @@ void DeleteAll(const char **a, size_t n) {
 
 class Compare {
  public:
-  bool operator()(const char * const &a, const char * const &b) {
+  bool operator()(const char* const &a, const char* const &b) {
     return strcmp(a, b) < 0;
   }
 };
@@ -76,11 +76,6 @@ int main() {
     InitRandom(strings, NUM_ELEMS);
     benchmark("ParallelStringRadixSort::Sort(%d)", t) {
       psrs.Sort(strings, NUM_ELEMS);
-    }
-    for (size_t i = 1; i < NUM_ELEMS; ++i) {
-      assert(strings[i - 1] && strings[i]);
-      assert(strcmp(strings[i - 1], strings[i]) <= 0);
-      assert(strings[i - 1] != strings[i]);
     }
     DeleteAll(strings, NUM_ELEMS);
   }

@@ -43,21 +43,21 @@
 #include <string>
 
 #define PSRS_CHECK(expr)                                                \
-  if (expr);                                                            \
-  else {                                                                \
+  if (expr) {                                                           \
+  } else {                                                              \
     fprintf(stderr, "CHECK Failed(%s:%d): %s\n",                        \
             __FILE__, __LINE__, __STRING(expr));                        \
     exit(EXIT_FAILURE);                                                 \
   }
 
 namespace parallel_string_radix_sort {
-template<typename StringType> class Compare {};
+template<typename StringType> class Compare;
 
 template<> class Compare<const char*> {
  public:
   explicit Compare(int depth) : depth_(depth) {}
 
-  inline bool operator()(const char * const &a, const char * const &b) {
+  inline bool operator()(const char* const &a, const char* const &b) {
     return strcmp(a + depth_, b + depth_) < 0;
   }
  private:
@@ -82,7 +82,6 @@ class ParallelStringRadixSort {
   ParallelStringRadixSort();
   ~ParallelStringRadixSort();
   void Init(size_t max_elems);
-  void DeleteAll();
   void Sort(StringType *strings, size_t num_elems);
 
  private:
@@ -95,6 +94,8 @@ class ParallelStringRadixSort {
 
   uint8_t *letters8_;
   uint16_t *letters16_;
+
+  void DeleteAll();
 
   // Sort elements in |strings| in range [bgn, end),
   // which have common prefix with |depth| characters.
@@ -158,7 +159,8 @@ void ParallelStringRadixSort<StringType>::DeleteAll() {
 }
 
 template<typename StringType>
-void ParallelStringRadixSort<StringType>::Sort(StringType *strings, size_t num_elems) {
+void ParallelStringRadixSort<StringType>
+::Sort(StringType *strings, size_t num_elems) {
   assert(num_elems <= max_elems_);
   data_ = strings;
   Sort16Parallel(0, num_elems, 0, false);

@@ -1,7 +1,7 @@
-#include "parallel_string_radix_sort.h"
-
 #include <iostream>
 #include <string>
+
+#include "parallel_string_radix_sort.h"
 
 int main() {
   // Sorting std::string
