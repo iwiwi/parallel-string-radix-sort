@@ -51,6 +51,10 @@
   }
 
 namespace parallel_string_radix_sort {
+namespace internal {
+/**
+ * Comparison function class used in |ParallelStringRadixSort|.
+ */
 template<typename StringType> class Compare;
 
 template<> class Compare<const char*> {
@@ -75,17 +79,40 @@ template<> class Compare<std::string> {
  private:
   int depth_;
 };
+}  // namespace internal
 
+/**
+ * The class to perform string sorting.
+ *
+ * @param StringType The type of the strings to be sorted.
+ *                   This should be either of |const char*| or |std::string|.
+ */
 template<typename StringType>
 class ParallelStringRadixSort {
  public:
   ParallelStringRadixSort();
+
   ~ParallelStringRadixSort();
+
+  /**
+   * Initialize the class.
+   *
+   * @param max_elems the maximum number of the elements to be sorted
+   */
   void Init(size_t max_elems);
+
+  /**
+   * Sort an array of strings.
+   *
+   * @param strings the array to be sorted
+   * @param num_elems the number of the elements in the given array
+   */
   void Sort(StringType *strings, size_t num_elems);
 
  private:
+  /// The theshold of size of ranges to call |std::sort|
   static const size_t kThreshold = 30;
+  /// The limit of depth to call |std::sort|
   static const size_t kDepthLimit = 100;
 
   size_t max_elems_;
@@ -95,19 +122,60 @@ class ParallelStringRadixSort {
   uint8_t *letters8_;
   uint16_t *letters16_;
 
+  /**
+   * Release all the allocated resources.
+   */
   void DeleteAll();
 
-  // Sort elements in |strings| in range [bgn, end),
-  // which have common prefix with |depth| characters.
+  /**
+   * Sort elements in range [bgn, end),
+   * which have common prefix with |depth| characters.
+   *
+   * @param flip When false, read from |data_|, write to |temp_| and recurse.
+   *             When true, read from |temp_|, write to |data_| and recurse.
+   */
   void Sort8(size_t bgn, size_t end, size_t depth, bool flip);
 
-  // Sort elements in |strings| in range [bgn, end),
-  // which have common prefix with |depth| characters.
-  // Treat pairs of characters as single super characters.
+  /**
+   * Sort elements in range [bgn, end),
+   * which have common prefix with |depth| characters.
+   *
+   * Treat pairs of characters as single super characters.
+   *
+   * @param flip When false, read from |data_|, write to |temp_| and recurse.
+   *             When true, read from |temp_|, write to |data_| and recurse.
+   */
   void Sort16(size_t bgn, size_t end, size_t depth, bool flip);
 
+  /**
+   * Sort elements in range [bgn, end),
+   * which have common prefix with |depth| characters.
+   *
+   * Treat pairs of characters as single super characters.
+   *
+   * Builds threads and recurse in parallel.
+   *
+   * @param flip When false, read from |data_|, write to |temp_| and recurse.
+   *             When true, read from |temp_|, write to |data_| and recurse.
+   */
   void Sort16Parallel(size_t bgn, size_t end, size_t depth, bool flip);
 
+  /**
+   * Sort elements in range [bgn, end),
+   * which have common prefix with |depth| characters.
+   *
+   * The size of the range determines the action of this function.
+   *
+   * If the size is sufficiently small (smaller than or equal to |kThreshold|),
+   * we call |std::sort| complete the sorting.
+   * In doing so, regardless of |flip|, write the result to |data_|.
+   *
+   * If the size is smaller than |1 << 16| then we call |Sort8|,
+   * otherwise we call |Sort16|.
+   *
+   * If the |depth| is larget than or equal to |kDepthLimit|,
+   * we also use |std::sort|. This is to avoid stack overflow.
+   */
   inline void Recurse(size_t bgn, size_t end, size_t depth, bool flip) {
     size_t n = end - bgn;
     if (depth >= kDepthLimit || n <= kThreshold) {
@@ -117,7 +185,7 @@ class ParallelStringRadixSort {
         }
       }
       if (n > 1) {
-        std::sort(data_ + bgn, data_ + end, Compare<StringType>(depth));
+        std::sort(data_ + bgn, data_ + end, internal::Compare<StringType>(depth));
       }
     } else if (n < (1 << 16)) {
       Sort8(bgn, end, depth, flip);
@@ -320,6 +388,18 @@ void ParallelStringRadixSort<StringType>
   }
 }
 
+/**
+ * Sort an array of strings.
+ *
+ * This function automatically initialize an instance of
+ * |ParallelStringRadixSort| and perform sorting.
+ *
+ * If you perform sorting more than once, you can avoid the cost of
+ * initialization using |ParallelStringRadixSort| class by yourself.
+ *
+ * @param strings the array to be sorted
+ * @param num_elems the number of the elements in the given array
+ */
 template<typename StringType>
 void Sort(StringType *strings, size_t num_elems) {
   ParallelStringRadixSort<StringType> psrs;
