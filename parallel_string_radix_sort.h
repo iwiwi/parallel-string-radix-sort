@@ -42,14 +42,11 @@
 #include <cstring>
 #include <string>
 
-#if !defined(__STRING)
-#define __STRING(s) #s
-#endif
 #define PSRS_CHECK(expr)                                                \
   if (expr) {                                                           \
   } else {                                                              \
     fprintf(stderr, "CHECK Failed(%s:%d): %s\n",                        \
-            __FILE__, __LINE__, __STRING(expr));                        \
+            __FILE__, __LINE__, #expr);                                 \
     exit(EXIT_FAILURE);                                                 \
   }
 
