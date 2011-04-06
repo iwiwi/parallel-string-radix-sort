@@ -64,7 +64,7 @@ template<> class Compare<const char*> {
  public:
   explicit Compare(int depth) : depth_(depth) {}
 
-  inline bool operator()(const char* const &a, const char* const &b) {
+  inline bool operator()(const char* const a, const char* const b) {
     return strcmp(a + depth_, b + depth_) < 0;
   }
  private:
