@@ -243,8 +243,7 @@ void ParallelStringRadixSort<StringType>
   // Here we do not use |new| or |malloc|. This is because:
   // 1. these may be heavy bottle-necks under multi-thread, and
   // 2. the size is sufficiently small for preventing stack overflow.
-  size_t cnt[1 << 8];
-  memset(cnt, 0, sizeof(size_t) << 8);
+  size_t cnt[1 << 8] = {};
 
   StringType *src = (flip ? temp_ : data_) + bgn;
   StringType *dst = (flip ? data_ : temp_) + bgn;
@@ -286,9 +285,8 @@ void ParallelStringRadixSort<StringType>
 template<typename StringType>
 void ParallelStringRadixSort<StringType>
 ::Sort16(size_t bgn, size_t end, size_t depth, bool flip) {
-  size_t *cnt = new size_t[1 << 16];
+  size_t *cnt = new size_t[1 << 16]();
   PSRS_CHECK(cnt != NULL);
-  memset(cnt, 0, sizeof(size_t) << 16);
 
   StringType *src = (flip ? temp_ : data_) + bgn;
   StringType *dst = (flip ? data_ : temp_) + bgn;
@@ -336,8 +334,7 @@ void ParallelStringRadixSort<StringType>
 template<typename StringType>
 void ParallelStringRadixSort<StringType>
 ::Sort16Parallel(size_t bgn, size_t end, size_t depth, bool flip) {
-  size_t cnt[1 << 16];
-  memset(cnt, 0, sizeof(cnt));
+  size_t cnt[1 << 16] = {};
 
   StringType *src = (flip ? temp_ : data_) + bgn;
   StringType *dst = (flip ? data_ : temp_) + bgn;
