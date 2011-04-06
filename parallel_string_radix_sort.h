@@ -406,6 +406,11 @@ void Sort(StringType *strings, size_t num_elems) {
   psrs.Init(num_elems);
   psrs.Sort(strings, num_elems);
 }
+
+template<typename StringType, size_t kNumElems>
+void Sort(StringType (&strings)[kNumElems]) {
+  Sort(strings, kNumElems);
+}
 }  // namespace parallel_string_radix_sort
 
 #undef PSRS_CHECK
