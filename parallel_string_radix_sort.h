@@ -42,6 +42,9 @@
 #include <cstring>
 #include <string>
 
+#if !defined(__STRING)
+#define __STRING(s) #s
+#endif
 #define PSRS_CHECK(expr)                                                \
   if (expr) {                                                           \
   } else {                                                              \
