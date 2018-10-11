@@ -6,7 +6,7 @@
 #include <string>
 #include <algorithm>
 #include <cassert>
-
+#include<stdio.h>
 #include "parallel_string_radix_sort.h"
 
 const int MAX_LEN = 30;
